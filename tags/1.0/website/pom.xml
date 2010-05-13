@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+     (c) 2009, 2010 ThoughtWorks Ltd
+     All rights reserved.
+    
+     The software in this package is published under the terms of the BSD
+     style license a copy of which has been included with this distribution in
+     the LICENSE.txt file.
+    
+     Created on 29-Jun-2009
+    -->
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.thoughtworks.proxytoys</groupId>
+    <artifactId>proxytoys-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>proxytoys-site</artifactId>
+  <packaging>pom</packaging>
+  <name>ProxyToys Website</name>
+  <dependencies>
+    <dependency>
+      <groupId>com.thoughtworks.proxytoys</groupId>
+      <artifactId>proxytoys</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.thoughtworks.proxytoys</groupId>
+      <artifactId>proxytoys</artifactId>
+      <classifier>javadoc</classifier>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-javadoc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+              <classifier>javadoc</classifier>
+              <outputDirectory>${project.build.directory}/xsite/apidocs</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.xsite</groupId>
+        <artifactId>xsite-maven-plugin</artifactId>
+        <configuration>
+          <sourceDirectoryPath>${basedir}/src/site</sourceDirectoryPath>
+          <compositionFilePath>config/xsite.xml</compositionFilePath>
+          <sitemapPath>content/sitemap.xml</sitemapPath>
+          <skinPath>templates/skin.html</skinPath>
+          <resourcePaths>resources</resourcePaths>
+          <outputDirectoryPath>${project.build.directory}/xsite</outputDirectoryPath>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>bin</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${basedir}/src/assembly/assembly-bin.xml</descriptor>
+                <descriptor>${basedir}/src/assembly/assembly-src.xml</descriptor>
+              </descriptors>
+              <finalName>proxytoys-${pom.version}</finalName>
+              <workDirectory>target/assembly/bin</workDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <goals>deploy site:deploy</goals>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <inputDirectory>${project.build.directory}/xsite</inputDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <distributionManagement>
+    <site>
+      <id>codehaus.org</id>
+      <url>dav:https://dav.codehaus.org/proxytoys</url>
+    </site>
+  </distributionManagement>
+</project>
